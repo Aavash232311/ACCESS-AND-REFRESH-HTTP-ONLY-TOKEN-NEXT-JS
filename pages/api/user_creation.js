@@ -68,17 +68,22 @@ export default async function handler(req, res) {
                     res.status(200).json({message: "two password field didn't matched", verification: false});
                 } else {
 
-                    await prisma.user.create({
-                        data: {
-                            full_name: attr['full_name'],
-                            email: attr['email'],
-                            password: CryptoJS.SHA256(attr['password1']).toString(),
-                            class_name: attr['class_name'],
-                            attempt: 0,
-                            one_time_password: 0,
-                            student: attr['student']
-                        },
-                    });
+                    try {
+                        await prisma.user.create({
+                            data: {
+                                full_name: attr['full_name'],
+                                email: attr['email'],
+                                password: CryptoJS.SHA256(attr['password1']).toString(),
+                                class_name: attr['class_name'],
+                                attempt: 0,
+                                one_time_password: 0,
+                                student: attr['student']
+                            },
+                        });
+                    } catch (err) {
+                        // error is expected about email because email is set to be unique field in the database
+                        res.status(200).json({message: "User with this email already exists", verification: false});
+                    }
 
 
                     function generateRandomIntegerInRange(min, max) {
@@ -86,11 +91,6 @@ export default async function handler(req, res) {
                     }
 
                     let otpCode = generateRandomIntegerInRange(1000, 9999);
-
-                    // email verification
-                    // validation code valid for 30min
-                    // false value tolerance count is 5
-                    // resend verification api
 
                     await transporter.sendMail(mailOptions(
                         senderGmail,

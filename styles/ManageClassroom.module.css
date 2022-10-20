@@ -1,0 +1,18 @@
+.formFrame {
+    width: 70%;
+    height: 600px;
+}
+.localFormControl {
+    width: 100%;
+}
+.searchButton {
+    float: right;
+    margin-left: 20px;
+}
+
+
+@media screen and (max-width: 720px) {
+    .formFrame{
+        width: 100%;
+    }
+}

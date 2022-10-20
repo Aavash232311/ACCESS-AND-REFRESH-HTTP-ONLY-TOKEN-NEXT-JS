@@ -1,0 +1,13 @@
+.form_frame {
+    width: 50%;
+    height: 350px;
+}
+.form_spacing {
+    margin-top: 10px;
+    width: 80%;
+}
+@media screen and (max-width: 720px){
+    .form_spacing, .form_frame {
+        width: 100%;
+    }
+}

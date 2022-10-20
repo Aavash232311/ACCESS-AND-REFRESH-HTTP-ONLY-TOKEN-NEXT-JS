@@ -7,7 +7,7 @@ let CryptoJS = require("crypto-js");
 let jwt = require('jsonwebtoken');
 
 export default async function login(req, res) {
-    const csrfToken = await csrf(req, res);
+    await csrf(req, res);
 
     if (req.method === 'POST') {
 
@@ -48,22 +48,38 @@ export default async function login(req, res) {
                     id: queryset[0]['id']
 
                 }
-
+                // REFRESH TOKEN
+                const refreshToken = jwt.sign({email: queryset[0]['email']}, process.env.REFRESH_SECRET, null, {expiresIn: '1d'});
+                const refreshTokenSer = cookie.serialize("longTermHash", refreshToken, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV !== "development",
+                    maxAge: 24 * 60 * 60 * 1000,
+                    sameSite: "strict",
+                    path: "/",
+                })
+                // ACCESS TOKEN
                 jwt.sign({tokenArgs}, process.env.JWT_SECRET_KEY, function (err, token) {
                     res.setHeader(
                         "Set-Cookie",
-                        cookie.serialize("token", token, {
-                            httpOnly: true,
-                            secure: process.env.NODE_ENV !== "development",
-                            maxAge: 60 * 60,
-                            sameSite: "strict",
-                            path: "/",
-                        })
+                        [
+                            cookie.serialize("token", token, {
+                                    httpOnly: true,
+                                    secure: process.env.NODE_ENV !== "development",
+                                    maxAge: 600,
+                                    sameSite: "strict",
+                                    path: "/",
+                                },
+                            ),
+                            refreshTokenSer
+                        ],
+
                     );
+
                     return res.status(200).json({
                         message: "valid", success: true, username: queryset[0]['full_name']
                     });
-                }, {expiresIn: '1h'});
+                }, {expiresIn: '12m'});
+
             } else {
                 return res.status(200).json({success: false});
             }

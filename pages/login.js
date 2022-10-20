@@ -53,6 +53,23 @@ export default function Login({csrfToken}) {
         }).then((rsp => rsp.json())).then(function (response) {
             if (response.success === true) {
                 localStorage.setItem('username', response.username);
+
+                setInterval(() => {
+                    const request = new Request('/api/refresh_token', {
+                        headers: {'Content-Type': 'application/json', 'CSRF-Token': csrfToken}
+                    });
+                    fetch(request, {
+                        mode: "same-origin",
+                        method: "POST",
+                        body: JSON.stringify({
+                            token: null
+                        })
+                    }).then(res => res.json()).then((response) => {
+                        console.log(response.status);
+                    });
+                }, 600000);
+
+
                 Router.push('/');
 
             } else {

@@ -8,11 +8,15 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Router from "next/router";
 import csrf from "../utils/cerf";
+import styles from '/styles/Nav.module.css';
+import User from "../utils/server_side_user";
 
 
 export async function getServerSideProps(context) {
-    const {req, res} = context
-    await csrf(req, res)
+    const {req, res} = context;
+    await csrf(req, res);
+    const user = await User(req, res);
+    console.log(user);
     return {
         props: {csrfToken: req.csrfToken()},
     }
@@ -54,7 +58,7 @@ export default function Nav({csrfToken}) {
             method: 'post',
             mode: "same-origin",
             body: JSON.stringify({})
-        }).then();
+        }).then(rsp => rsp.json()).then(() => {location.reload();});
     }
 
     const NavMainLogic = (params) => {
@@ -81,8 +85,18 @@ export default function Nav({csrfToken}) {
         }
     }
 
+    const [menu, setMenu] = React.useState(false);
+
+    const horizontalMenuExpand = () => {
+        if (!menu) {
+            setMenu(true);
+        } else {
+            setMenu(false);
+        }
+    }
+
     return (
-        <div>
+        <div className={styles.navFonts}>
             <Box sx={{flexGrow: 1}}>
                 <AppBar position="static">
                     <Toolbar>
@@ -92,20 +106,27 @@ export default function Nav({csrfToken}) {
                             color="inherit"
                             aria-label="menu"
                             sx={{mr: 2}}
+                            onClick={horizontalMenuExpand}
                         >
                             <MenuIcon/>
                         </IconButton>
                         <Typography onClick={() => {
                             Router.push('/')
-                        }} variant="h6" component="div" sx={{flexGrow: 1}}>
+                        }} variant="h6" style={{cursor: "pointer"}} component="div" sx={{flexGrow: 1}}>
                             Notes App
                         </Typography>
                         <UserGreetings bool={log}/>
                         <NavMainLogic bool={log}/>
                     </Toolbar>
                 </AppBar>
+
             </Box>
             <br/>
+            <div className={styles.horizontalNav} style={{display: menu ? 'block' : 'none'}}>
+                <center>
+                    <h3>Options {csrfToken}</h3>
+                </center>
+            </div>
         </div>
     )
 }

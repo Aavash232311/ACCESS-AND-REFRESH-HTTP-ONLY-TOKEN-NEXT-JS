@@ -12,7 +12,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import {createTheme, ThemeProvider} from '@mui/material/styles';
 import csrf from '../utils/cerf';
-import {Switch} from "@mui/material";
+import {Alert, Switch} from "@mui/material";
 import Router from 'next/router'
 
 const theme = createTheme();
@@ -24,6 +24,9 @@ export default function Register({csrfToken}) {
     const email = React.useRef(null);
     const password1 = React.useRef(null);
     const password2 = React.useRef(null);
+
+    const [error, setError] = React.useState(false);
+    const [errorCode, setErrorCode] = React.useState(false);
 
     const submitForm = (ev) => {
         ev.preventDefault();
@@ -48,9 +51,25 @@ export default function Register({csrfToken}) {
         }).then(rsp => rsp.json()).then(function (resp) {
             if (resp.message === 'VALID') {
                 Router.push('/email_code/' + email.current.value);
+            } else {
+                const errorCode = resp.message;
+                setError(true);
+                setErrorCode(errorCode);
             }
         })
 
+    }
+
+    const ErrorBox = (params) => {
+        if (params.bool === true) {
+            return (
+                <div>
+                    <Alert variant="outlined" severity="error">
+                        {params.error}
+                    </Alert>
+                </div>
+            )
+        } else return null;
     }
 
     const [student, setStudent] = React.useState(true);
@@ -85,6 +104,7 @@ export default function Register({csrfToken}) {
                             <Box component="form" onSubmit={(ev) => {
                                 submitForm(ev);
                             }} noValidate sx={{mt: 1}}>
+                                <ErrorBox bool={error} error={errorCode}/>
 
                                 <TextField
                                     margin="normal"

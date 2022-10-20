@@ -1,9 +1,8 @@
 import cookie from 'cookie';
 
-export default function logout(req, res) {
+export default async function logout(req, res) {
     const header = req.cookies['token'];
     if (header !== null) {
-        console.log("FCUK REQUEST ")
         res.setHeader(
             "Set-Cookie",
             cookie.serialize("token", null, {
@@ -14,7 +13,6 @@ export default function logout(req, res) {
                 path: "/",
             })
         );
-        console.log(res);
         res.status(200).json({})
     }
 

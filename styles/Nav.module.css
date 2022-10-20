@@ -1,0 +1,32 @@
+.horizontalNav {
+    width: 20%;
+    height: 600px;
+    position: absolute;
+    margin-left: 10px;
+    border-radius: 5px;
+    background: rgba(208, 144, 2, 0.78);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(208, 144, 2, 0.3);
+    z-index: 1999;
+}
+
+@media screen and (max-width: 620px) {
+    .horizontalNav {
+        width: 80%;
+    }
+}
+
+
+@media screen and (max-width: 380px) {
+    .navFonts {
+        font-size: 2px;
+    }
+}
+
+@media screen and (max-width: 720px) {
+    .navFonts {
+        font-size: 12px;
+    }
+}
